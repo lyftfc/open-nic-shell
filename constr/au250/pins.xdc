@@ -26,8 +26,9 @@ set_property IOSTANDARD LVCMOS12 [get_ports pcie_rstn]
 
 set num_ports [llength [get_ports qsfp_refclk_p]]
 if {$num_ports >= 1} {
-    set_property PACKAGE_PIN M10 [get_ports qsfp_refclk_n[0]]
-    set_property PACKAGE_PIN M11 [get_ports qsfp_refclk_p[0]]
+	# Original M10/11
+    set_property PACKAGE_PIN T10 [get_ports qsfp_refclk_n[0]]
+    set_property PACKAGE_PIN T11 [get_ports qsfp_refclk_p[0]]
 }
 if {$num_ports >= 2} {
     set_property PACKAGE_PIN T10 [get_ports qsfp_refclk_n[1]]
