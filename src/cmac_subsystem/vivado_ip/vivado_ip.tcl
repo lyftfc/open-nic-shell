@@ -18,6 +18,7 @@
 set ips {
     cmac_usplus_0
     cmac_subsystem_axi_crossbar
+	ila_axis_cmac
 }
 if {$num_cmac_port == 2} {
     lappend ips "cmac_usplus_1"

@@ -16,6 +16,8 @@
 //
 // *************************************************************************
 `timescale 1ns/1ps
+//`define DBG_IBERT = 1
+`define DBG_ILA = 1
 module cmac_subsystem_cmac_wrapper #(
   parameter int CMAC_ID = 0
 ) (
@@ -292,6 +294,42 @@ module cmac_subsystem_cmac_wrapper #(
   wire        ctl_tx_send_idle;
   wire        ctl_tx_send_rfi;
   wire        ctl_tx_send_lfi;
+  
+`ifdef DBG_IBERT
+  wire        ibert_rxclkin;
+  wire  [3:0] ibert_drpclk;
+  wire  [3:0] ibert_eyescanreset;
+  wire [11:0] ibert_rxrate;
+  wire [19:0] ibert_txdiffctrl;
+  wire [19:0] ibert_txprecursor;
+  wire [19:0] ibert_txpostcursor;
+  wire  [3:0] ibert_rxlpmen;
+  
+  wire  [9:0] gt0_drpaddr;
+  wire        gt0_drpen;
+  wire [15:0] gt0_drpdi;
+  wire [15:0] gt0_drpdo;
+  wire        gt0_drprdy;
+  wire        gt0_drpwe;
+  wire  [9:0] gt1_drpaddr;
+  wire        gt1_drpen;
+  wire [15:0] gt1_drpdi;
+  wire [15:0] gt1_drpdo;
+  wire        gt1_drprdy;
+  wire        gt1_drpwe;
+  wire  [9:0] gt2_drpaddr;
+  wire        gt2_drpen;
+  wire [15:0] gt2_drpdi;
+  wire [15:0] gt2_drpdo;
+  wire        gt2_drprdy;
+  wire        gt2_drpwe;
+  wire  [9:0] gt3_drpaddr;
+  wire        gt3_drpen;
+  wire [15:0] gt3_drpdi;
+  wire [15:0] gt3_drpdo;
+  wire        gt3_drprdy;
+  wire        gt3_drpwe;
+`endif
 
   assign cmac_clk                = txusrclk2;
   assign init_clk                = axil_aclk;
@@ -320,7 +358,11 @@ module cmac_subsystem_cmac_wrapper #(
       .gt_ref_clk_n                        (gt_refclk_n),
       .gt_ref_clk_out                      (),
       .gt_rxrecclkout                      (),
+`ifdef DBG_IBERT
+      .gt_rxusrclk2                        (ibert_rxclkin),
+`else
       .gt_rxusrclk2                        (),
+`endif
       .rx_clk                              (txusrclk2),
       .gt_txusrclk2                        (txusrclk2),
 
@@ -589,6 +631,70 @@ module cmac_subsystem_cmac_wrapper #(
       .ctl_tx_send_idle                    (ctl_tx_send_idle),
       .ctl_tx_send_rfi                     (ctl_tx_send_rfi),
       .ctl_tx_send_lfi                     (ctl_tx_send_lfi),
+      
+`ifdef DBG_IBERT
+      .gt_eyescandataerror                 (),//4'bo
+      .gt_eyescanreset                     (ibert_eyescanreset),//4'bi
+      .gt_eyescantrigger                   (4'b0),//4'bi
+      .gt_rxcdrhold                        (4'b0),//4'bi
+      .gt_rxpolarity                       (4'b0),//4'bi
+      .gt_rxrate                           (ibert_rxrate),//12'bi
+      .gt_txdiffctrl                       (ibert_txdiffctrl),//20'bi
+      .gt_txpolarity                       (4'b0),//4'bi
+      .gt_txinhibit                        (4'b0),//4'bi
+      .gt_txpippmen                        (4'b0),//4'bi
+      .gt_txpippmsel                       (4'b0),//4'bi
+      .gt_txpostcursor                     (ibert_txpostcursor),//20'bi
+      .gt_txprbsforceerr                   (4'b0),//4'bi
+      .gt_txprecursor                      (ibert_txprecursor),//20'bi
+      .gt_txbufstatus                      (),//8'bo
+      .gt_rxdfelpmreset                    (4'b0),//4'bi
+      .gt_rxlpmen                          (ibert_rxlpmen),//4'bi
+      .gt_rxprbscntreset                   (4'b0),//4'bi
+      .gt_rxprbserr                        (),//4'bo
+      .gt_rxprbssel                        (16'b0),//16'bi
+      .gt_rxresetdone                      (),//4'bo
+      .gt_txprbssel                        (16'b0),//16'bi
+      .gt_txresetdone                      (),//4'bo
+      .gt_rxbufstatus                      (),//12'bo
+ 
+      .gt_drpclk                           (ibert_drpclk[0]),//i
+      
+      .gt0_drpdo                           (gt0_drpdo),//16'bo
+      .gt0_drprdy                          (gt0_drprdy),//o
+      .gt0_drpen                           (gt0_drpen),//i
+      .gt0_drpwe                           (gt0_drpwe),//i
+      .gt0_drpaddr                         (gt0_drpaddr),//10'bi
+      .gt0_drpdi                           (gt0_drpdi),//16'bi
+      
+      .gt1_drpdo                           (gt1_drpdo),//16'bo
+      .gt1_drprdy                          (gt1_drprdy),//o
+      .gt1_drpen                           (gt1_drpen),//i    
+      .gt1_drpwe                           (gt1_drpwe),//i    
+      .gt1_drpaddr                         (gt1_drpaddr),//10'bi
+      .gt1_drpdi                           (gt1_drpdi),//16'bi
+      
+      .gt2_drpdo                           (gt2_drpdo),//16'bo
+      .gt2_drprdy                          (gt2_drprdy),//o    
+      .gt2_drpen                           (gt2_drpen),//i    
+      .gt2_drpwe                           (gt2_drpwe),//i    
+      .gt2_drpaddr                         (gt2_drpaddr),//10'bi
+      .gt2_drpdi                           (gt2_drpdi),//16'bi
+      
+      .gt3_drpdo                           (gt3_drpdo),//16'bo
+      .gt3_drprdy                          (gt3_drprdy),//o    
+      .gt3_drpen                           (gt3_drpen),//i    
+      .gt3_drpwe                           (gt3_drpwe),//i    
+      .gt3_drpaddr                         (gt3_drpaddr),//10'bi
+      .gt3_drpdi                           (gt3_drpdi),//16'bi
+      
+      .common0_drpdo                       (),//16'bo
+      .common0_drprdy                      (),//o    
+      .common0_drpen                       (1'b0),//i    
+      .common0_drpwe                       (1'b0),//i    
+      .common0_drpaddr                     (0),//16'bi
+      .common0_drpdi                       (0),//16'bi
+`endif
 
       .core_drp_reset                      (1'b0),
       .drp_clk                             (1'b0),
@@ -599,6 +705,76 @@ module cmac_subsystem_cmac_wrapper #(
       .drp_rdy                             (),
       .drp_we                              (1'b0)
     );
+    
+`ifdef DBG_IBERT
+    in_system_ibert_0 cmac_dbg_ibert (
+      .clk                                 (init_clk),
+      .rxoutclk_i                          ({4{ibert_rxclkin}}),
+      
+      .drpclk_o                            (ibert_drpclk),//4'b
+      .eyescanreset_o                      (ibert_eyescanreset),//4'b
+      .rxrate_o                            (ibert_rxrate),//12'b
+      .txdiffctrl_o                        (ibert_txdiffctrl),//20'b
+      .txprecursor_o                       (ibert_txprecursor),//20'b
+      .txpostcursor_o                      (ibert_txpostcursor),//20'b
+      .rxlpmen_o                           (ibert_rxlpmen),//4'b
+      
+      .gt0_drpaddr_o                       (gt0_drpaddr),//10'b
+      .gt0_drpen_o                         (gt0_drpen),
+      .gt0_drpdi_o                         (gt0_drpdi),//16'b
+      .gt0_drpdo_i                         (gt0_drpdo),//16'b
+      .gt0_drprdy_i                        (gt0_drprdy),
+      .gt0_drpwe_o                         (gt0_drpwe),
+            
+      .gt1_drpaddr_o                       (gt1_drpaddr),//10'b
+      .gt1_drpen_o                         (gt1_drpen),
+      .gt1_drpdi_o                         (gt1_drpdi),//16'b
+      .gt1_drpdo_i                         (gt1_drpdo),//16'b
+      .gt1_drprdy_i                        (gt1_drprdy),
+      .gt1_drpwe_o                         (gt1_drpwe),
+            
+      .gt2_drpaddr_o                       (gt2_drpaddr),//10'b
+      .gt2_drpen_o                         (gt2_drpen),
+      .gt2_drpdi_o                         (gt2_drpdi),//16'b
+      .gt2_drpdo_i                         (gt2_drpdo),//16'b
+      .gt2_drprdy_i                        (gt2_drprdy),
+      .gt2_drpwe_o                         (gt2_drpwe),
+            
+      .gt3_drpaddr_o                       (gt3_drpaddr),//10'b
+      .gt3_drpen_o                         (gt3_drpen),
+      .gt3_drpdi_o                         (gt3_drpdi),//16'b
+      .gt3_drpdo_i                         (gt3_drpdo),//16'b
+      .gt3_drprdy_i                        (gt3_drprdy),
+      .gt3_drpwe_o                         (gt3_drpwe)
+    );
+`endif
+
+`ifdef DBG_ILA
+    ila_axis_cmac ila_tx_probe (
+      .clk                                 (cmac_clk),
+      .probe0                              (s_axis_tx_tvalid),
+      .probe1                              (s_axis_tx_tdata),
+      .probe2                              (s_axis_tx_tkeep),   //tstrobe
+      .probe3                              (s_axis_tx_tready),
+      .probe4                              (s_axis_tx_tlast),
+      .probe5                              (s_axis_tx_tuser_err),
+      .probe6                              (s_axis_tx_tkeep),
+      .probe7                              (1'b0),  //tdest
+      .probe8                              (1'b0)   //tid
+    );
+    ila_axis_cmac ila_rx_probe (
+      .clk                                 (cmac_clk),
+      .probe0                              (m_axis_rx_tvalid),
+      .probe1                              (m_axis_rx_tdata),
+      .probe2                              (m_axis_rx_tkeep),   //tstrobe
+      .probe3                              (m_axis_rx_tvalid),  //tready
+      .probe4                              (m_axis_rx_tlast),
+      .probe5                              (m_axis_rx_tuser_err),
+      .probe6                              (m_axis_rx_tkeep),
+      .probe7                              (1'b0),  //tdest
+      .probe8                              (1'b0)   //tid
+    );
+`endif
   end
   else begin
     cmac_usplus_1 cmac_inst (
