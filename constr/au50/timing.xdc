@@ -31,4 +31,4 @@ resize_pblock [get_pblocks pblock_packet_adapter_tx] -add {CLOCKREGION_X1Y2:CLOC
 
 create_pblock pblock_packet_adapter_rx
 add_cells_to_pblock [get_pblocks pblock_packet_adapter_rx] [get_cells -quiet {cmac_port*.packet_adapter_inst/rx_inst}]
-resize_pblock [get_pblocks pblock_packet_adapter_rx] -add {CLOCKREGION_X5Y2:CLOCKREGION_X6Y3}
+resize_pblock [get_pblocks pblock_packet_adapter_rx] -add {CLOCKREGION_X4Y2:CLOCKREGION_X5Y3}
